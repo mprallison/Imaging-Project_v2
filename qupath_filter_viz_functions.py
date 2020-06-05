@@ -1,5 +1,7 @@
 def coordFilter(df):
     '''set x,y slice coordinates to filter cells'''
+    
+    df = df.reset_index().drop(columns='index')
 
     x_min,x_max = (float(x) for x in input('x limits:').split())
     y_min,y_max = (float(x) for x in input('y limits:').split())
@@ -16,6 +18,8 @@ def coordFilter(df):
 
 def channelFilter(df):
     '''set channel parameters to filter cells'''
+    
+    df = df.reset_index().drop(columns='index')
     
     z = input('Enter "and" for conjunction or "or" for disjunction of parameters:')
     a, b = (float(x) for x in input('red filter:').split())
@@ -44,6 +48,8 @@ def channelFilter(df):
 def clusterFilter(df):
     '''choose 1+ clusters by which to filter cells'''
     
+    df = df.reset_index().drop(columns='index')
+    
     clusters = input('filter clusters:').split()
     clusters = set(list(map(int, clusters)))
     
@@ -59,6 +65,7 @@ def clusterFilter(df):
 
 def stackedBar(df,filtered):
     
+    import pandas as pd
     from bokeh.plotting import figure,show
     from bokeh.io import output_notebook,output_file
     from bokeh.models import SingleIntervalTicker, LinearAxis
@@ -161,6 +168,11 @@ def stackedBar(df,filtered):
         return show(p)      
 
 def imageMask(image,df):
+    
+    import matplotlib.pyplot as plt
+    
+    '''input original image and dataframe
+    return masked image of dataframe cells'''
 
     import numpy as np
     
@@ -202,8 +214,8 @@ def imageMask(image,df):
             
         return rgb_border
     
-    
     def singleMask(image,x,y):
+        '''set mask matrix to original image matrix'''
         x_lower_lim,x_upper_lim = borderLimits(x,max_x_coord)
         y_lower_lim,y_upper_lim = borderLimits(y,max_y_coord)
         
@@ -214,12 +226,15 @@ def imageMask(image,df):
     for i in coords:
         new_image = singleMask(image,i[0],i[1])
     
-    return new_image
+    plt.figure(figsize=(12,12))
+    
+    return plt.imshow(new_image)
 
 def emptyMatrixViz(df):
     '''input list of tuple coordinates 
        return viz of empty matrix and coordinate cells as RGB square proportional to cell channel values'''
     
+    import matplotlib.pyplot as plt
     import numpy as np
     from tqdm import tqdm
     
@@ -260,4 +275,6 @@ def emptyMatrixViz(df):
         image[:,:,1][x_limits[0]:x_limits[1],y_limits[0]:y_limits[1]] = df.loc[i].get('rgb_green')
         image[:,:,2][x_limits[0]:x_limits[1],y_limits[0]:y_limits[1]] = df.loc[i].get('rgb_blue')
     
-    return image
+    plt.figure(figsize=(12,12))
+    
+    return plt.imshow(image)
