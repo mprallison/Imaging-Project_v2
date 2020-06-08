@@ -45,13 +45,14 @@ def channelFilter(df):
     
     return df
 
-def clusterFilter(df):
-    '''choose 1+ clusters by which to filter cells'''
+def clusterFilter(df,clusters):
+    '''input df and list of clusters to filter'''
+    
+    if type(clusters) != list:
+        print('Error: cluster input must be list type')
+        return None
     
     df = df.reset_index().drop(columns='index')
-    
-    clusters = input('filter clusters:').split()
-    clusters = set(list(map(int, clusters)))
     
     def incCluster(x):
         if x in clusters:
@@ -63,7 +64,7 @@ def clusterFilter(df):
     
     return df
 
-def stackedBar(df,filtered):
+def stackedBar(df,filtered,column_filter):
     
     import pandas as pd
     from bokeh.plotting import figure,show
@@ -72,7 +73,7 @@ def stackedBar(df,filtered):
     output_notebook()
     
     '''return stacked bar viz with filter parameters returned as highlighted
-    two arguments: dataframe and filtered = True/False to call highlight'''
+    three arguments: dataframe, filtered = True/False to call highlight, and column with bool value'''
     
     if filtered is not True and filtered is not False:
         return 'Error: filter not declared'
@@ -116,7 +117,6 @@ def stackedBar(df,filtered):
         return show(p)
     
     if filtered == True:
-        column_filter = input('df filter column:')
         if column_filter not in df.columns:
             return 'column_filter not found'
         
